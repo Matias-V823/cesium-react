@@ -11,7 +11,8 @@ import {
 import { Viewer, Entity, Clock, CameraFlyTo } from "resium"
 import { io } from "socket.io-client"
 
-const CLOCK_DELAY_SECONDS = 2
+const CLOCK_DELAY_SECONDS = 40
+const TRANSITION_SECONDS = 15
 
 function CesiumLive() {
   const [nodeKeys, setNodeKeys] = useState<string[]>([])
@@ -46,7 +47,12 @@ function CesiumLive() {
           node.LAT,
           node.ALT ?? 0,
         )
-        positionsRef.current[id].addSample(JulianDate.now(), position)
+        const sampleTime = JulianDate.addSeconds(
+          JulianDate.now(),
+          -CLOCK_DELAY_SECONDS + TRANSITION_SECONDS,
+          new JulianDate(),
+        )
+        positionsRef.current[id].addSample(sampleTime, position)
       }
 
       setNodeKeys((prev) => {
